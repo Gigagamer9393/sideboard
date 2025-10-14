@@ -3,24 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neon Dashboard mit Firebase Login</title>
+<title>Neon Dashboard mit Login</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js"></script>
 <style>
 * { margin:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
 body { background-color:#0f0f1f; color:#00FFFF; }
 
 /* LOGIN STYLES */
 #loginContainer { display:flex; justify-content:center; align-items:center; height:100vh; background-image:url('background-image.jpeg'); background-size:cover; }
-.glass-container { width:320px; padding:30px; background:rgba(255,255,255,0.05); border-radius:15px; border:1px solid rgba(0,255,255,0.3); backdrop-filter:blur(10px); box-shadow:0 0 20px rgba(0,255,255,0.2);}
-.login-box { text-align:center; max-width:280px; margin:0 auto; }
-h2 { color:#00FFFF; margin-bottom:20px; text-shadow:0 0 10px #00FFFF; }
-input { padding:12px; margin-top:15px; border:1px solid rgba(0,255,255,0.5); border-radius:10px; background:transparent; color:#00FFFF; width:100%; font-size:14px; }
-input::placeholder { color:rgba(0,255,255,0.7); }
-input:focus { outline:none; border-color:#00FFFF; }
-button { background:#00FFFF; color:black; padding:12px; border:none; border-radius:10px; cursor:pointer; margin-top:15px; width:100%; font-weight:bold; text-shadow:0 0 5px #00FFFF; transition:0.3s;}
-button:hover { background:transparent; color:#00FFFF; border:1px solid #00FFFF; }
+.glass-container { width:300px; padding:30px; background:rgba(255,255,255,0.1); border-radius:10px; border:1px solid #fff; backdrop-filter:blur(5px);}
+.login-box { text-align:center; max-width:250px; margin:0 auto; }
+h2 { color:#fff; margin-bottom:20px; }
+input { padding:10px; margin-top:15px; border:1px solid #fff; border-radius:10px; background:transparent; color:#fff; }
+input::placeholder { color:#fff; }
+input:focus { outline:none; }
+button { background:#fff; color:black; padding:10px; border:none; border-radius:10px; cursor:pointer; margin-top:15px; }
+button:hover { background:transparent; color:white; outline:1px solid #fff; }
+.options { display:flex; align-items:center; margin-top:10px; font-size:12px; color:white; }
+.options input { margin-right:5px; }
+.options a { margin-left:auto; text-decoration:none; color:white; cursor:pointer; }
+p { font-size:12px; color:#fff; margin-top:15px; }
+#register { font-weight:bold; }
 
 /* DASHBOARD STYLES */
 #dashboard { display:none; flex:1; height:100vh; overflow:auto; padding:20px; }
@@ -56,10 +59,16 @@ small { display:block; margin-top:10px; color:#00FFFF; text-shadow:0 0 3px #00FF
     <div class="glass-container">
         <div class="login-box">
             <h2 id="formTitle">Login</h2>
-            <input type="text" id="username" placeholder="Email">
-            <input type="password" id="password" placeholder="Passwort">
-            <button type="button" onclick="login()">Login</button>
-            <p id="toggleText">Noch keinen Account? <button type="button" onclick="register()">Registrieren</button></p>
+            <form id="authForm">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <div class="options" id="loginOptions">
+                    <input type="checkbox" id="remember"><label for="remember">Remember me</label>
+                    <a href="#" id="forgotPassword">Forgot Password?</a>
+                </div>
+                <button type="submit" id="submitBtn">Login</button>
+                <p id="toggleText">Don't have an account? <a href="#" id="toggleForm">Register</a></p>
+            </form>
         </div>
     </div>
 </div>
@@ -95,53 +104,91 @@ small { display:block; margin-top:10px; color:#00FFFF; text-shadow:0 0 3px #00FF
 </div>
 
 <script>
-// Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyBJWwUcOilz6u8UeXIsB7CXcSpskIGm5J4",
-  authDomain: "neondashboard-5610e.firebaseapp.com",
-  projectId: "neondashboard-5610e",
-  storageBucket: "neondashboard-5610e.appspot.com",
-  messagingSenderId: "790936569249",
-  appId: "1:790936569249:web:abcdef123456"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+// LOGIN & REGISTRATION
+let authForm = document.getElementById('authForm');
+let toggleForm = document.getElementById('toggleForm');
+let formTitle = document.getElementById('formTitle');
+let submitBtn = document.getElementById('submitBtn');
+let loginOptions = document.getElementById('loginOptions');
+let isLogin = true;
 
-// Login
-function login() {
-    const email = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
-    auth.signInWithEmailAndPassword(email, password)
-        .then(() => showDashboard())
-        .catch(e => alert(e.message));
+// Umschalten Login/Register
+function toggleLoginRegister(e){
+    e.preventDefault(); 
+    isLogin = !isLogin;
+    if(isLogin){
+        formTitle.textContent="Login";
+        submitBtn.textContent="Login";
+        loginOptions.style.display="flex";
+        toggleForm.parentElement.innerHTML=`Don't have an account? <a href="#" id="toggleForm">Register</a>`;
+        document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
+    } else {
+        formTitle.textContent="Register";
+        submitBtn.textContent="Register";
+        loginOptions.style.display="none";
+        toggleForm.parentElement.innerHTML=`Already have an account? <a href="#" id="toggleForm">Login</a>`;
+        document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
+    }
 }
 
-// Registrierung
-function register() {
-    const email = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
-    auth.createUserWithEmailAndPassword(email, password)
-        .then(() => alert("Registrierung erfolgreich! Bitte nun einloggen."))
-        .catch(e => alert(e.message));
-}
+document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
 
-// Logout
-function logout() { auth.signOut().then(()=> location.reload()); }
+// Form Submission
+authForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const username=document.getElementById('username').value.trim();
+    const password=document.getElementById('password').value.trim();
+    if(!username||!password) return alert("Bitte Username und Passwort eingeben.");
+    let users=JSON.parse(localStorage.getItem('users')||'[]');
 
-// Auto-Login
-auth.onAuthStateChanged(user => { if(user) showDashboard(); });
+    if(isLogin){
+        const user=users.find(u=>u.username===username && u.password===password);
+        if(user){ loginSuccess(username); } else { alert("Falscher Username oder Passwort!"); }
+    } else {
+        if(users.find(u=>u.username===username)) return alert("Username existiert bereits!");
+        users.push({username,password});
+        localStorage.setItem('users',JSON.stringify(users));
+        alert("Registrierung erfolgreich! Bitte jetzt einloggen.");
 
-// Dashboard anzeigen
-function showDashboard(){
+        // Zurück zum Login
+        isLogin = true;
+        formTitle.textContent = "Login";
+        submitBtn.textContent = "Login";
+        loginOptions.style.display = "flex";
+        toggleForm.parentElement.innerHTML = `Don't have an account? <a href="#" id="toggleForm">Register</a>`;
+        document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
+    }
+});
+
+function loginSuccess(username){
+    localStorage.setItem('loggedInUser',username);
     document.getElementById('loginContainer').style.display='none';
     document.getElementById('dashboard').style.display='flex';
     document.body.classList.add('dashboard');
     initDashboard();
 }
 
-// Tabs
+function logout(){
+    localStorage.removeItem('loggedInUser');
+    location.reload();
+}
+
+// Passwort zurücksetzen
+document.getElementById('forgotPassword').addEventListener('click', e=>{
+    e.preventDefault();
+    const username = prompt("Gib deinen Benutzernamen ein, um das Passwort zurückzusetzen:");
+    if(!username) return;
+    let users = JSON.parse(localStorage.getItem('users')||'[]');
+    const userIndex = users.findIndex(u=>u.username===username);
+    if(userIndex === -1) return alert("Benutzer nicht gefunden!");
+    const newPassword = prompt("Gib dein neues Passwort ein:");
+    if(!newPassword) return alert("Kein Passwort eingegeben!");
+    users[userIndex].password = newPassword;
+    localStorage.setItem('users', JSON.stringify(users));
+    alert("Passwort erfolgreich geändert! Du kannst dich jetzt mit dem neuen Passwort einloggen.");
+});
+
+// Dashboard Tabs
 function showTab(tabId){
     document.querySelectorAll('.tab-content').forEach(tab=>tab.style.display='none');
     document.getElementById(tabId).style.display='block';
@@ -150,11 +197,11 @@ function showTab(tabId){
 // Clipboard Copy
 function copyToClipboard(text){ navigator.clipboard.writeText(text).then(()=>alert('Link kopiert: '+text)).catch(err=>alert('Fehler: '+err)); }
 
-// Dashboard Charts + Live Update
+// Dashboard Init + Charts
 function initDashboard(){
     showTab('modsCard');
-    const downloadsCtx = document.getElementById('downloadsChart').getContext('2d');
-    const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
+    const downloadsCtx=document.getElementById('downloadsChart').getContext('2d');
+    const visitorsCtx=document.getElementById('visitorsChart').getContext('2d');
 
     window.downloadsChart = new Chart(downloadsCtx,{
         type:'line',
@@ -168,17 +215,25 @@ function initDashboard(){
         options:{responsive:true,scales:{y:{beginAtZero:true}}}
     });
 
+    // Live Update Simulation
     setInterval(()=>{
         document.querySelector('#modsCard p').textContent = Math.floor(Math.random()*500);
         document.querySelector('#cheatsCard p').textContent = Math.floor(Math.random()*200);
         document.querySelector('#downloadsCard p').textContent = Math.floor(Math.random()*10000);
         document.querySelector('#visitorsCard p').textContent = Math.floor(Math.random()*5000);
+
         downloadsChart.data.datasets[0].data = Array.from({length:7},()=>Math.floor(Math.random()*1000));
         downloadsChart.update();
         visitorsChart.data.datasets[0].data = Array.from({length:7},()=>Math.floor(Math.random()*500));
         visitorsChart.update();
     },5000);
 }
+
+// Auto-Login wenn User bereits eingeloggt
+window.addEventListener('load',()=>{
+    const loggedInUser=localStorage.getItem('loggedInUser');
+    if(loggedInUser){ loginSuccess(loggedInUser); }
+});
 </script>
 
 </body>
