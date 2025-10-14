@@ -5,59 +5,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Firebase Login Test</title>
 <script type="module">
-  // Firebase Modular SDK
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
-      from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBJWwUcOilz6u8UeXIsB7CXcSpskIGm5J4",
-    authDomain: "neondashboard-5610e.firebaseapp.com",
-    projectId: "neondashboard-5610e",
-    storageBucket: "neondashboard-5610e.appspot.com",
-    messagingSenderId: "790936569249",
-    appId: "1:790936569249:web:abcdef123456"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBJWwUcOilz6u8UeXIsB7CXcSpskIGm5J4",
+  authDomain: "neondashboard-5610e.firebaseapp.com",
+  projectId: "neondashboard-5610e",
+  storageBucket: "neondashboard-5610e.appspot.com",
+  messagingSenderId: "790936569249",
+  appId: "1:790936569249:web:abcdef123456"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-  window.register = () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(()=>alert("Registrierung erfolgreich!"))
-      .catch(e=>alert(e.message));
+window.register = () => {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(()=>alert("Registrierung erfolgreich!"))
+    .catch(e=>alert(e.message));
+}
+
+window.login = () => {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
+  signInWithEmailAndPassword(auth, email, password)
+    .then(()=>alert("Login erfolgreich!"))
+    .catch(e=>alert(e.message));
+}
+
+window.logout = () => {
+  signOut(auth).then(()=>alert("Logout erfolgreich!"));
+}
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+  } else {
+    document.getElementById('loginContainer').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'none';
   }
-
-  window.login = () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
-    signInWithEmailAndPassword(auth, email, password)
-      .then(()=>alert("Login erfolgreich!"))
-      .catch(e=>alert(e.message));
-  }
-
-  window.logout = () => {
-    signOut(auth).then(()=>alert("Logout erfolgreich!"));
-  }
-
-  onAuthStateChanged(auth, user => {
-    if(user){
-      console.log("User eingeloggt:", user.email);
-      document.getElementById('loginContainer').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-    } else {
-      document.getElementById('loginContainer').style.display = 'block';
-      document.getElementById('dashboard').style.display = 'none';
-    }
-  });
+});
 </script>
 <style>
 body { background:#0f0f1f; color:#00FFFF; font-family:Arial; text-align:center; padding:50px; }
-input, button { padding:10px; margin:5px; border-radius:5px; border:none; }
+input, button { padding:10px; margin:5px; border-radius:5px; border:none; width:200px; }
 button { cursor:pointer; }
 </style>
 </head>
@@ -74,7 +71,7 @@ button { cursor:pointer; }
 <div id="dashboard" style="display:none;">
   <h1>Dashboard</h1>
   <button onclick="logout()">Logout</button>
-  <p>Hier kann später dein Neon Dashboard mit Charts und Tabs eingebaut werden.</p>
+  <p>Firebase Login funktioniert jetzt korrekt auf GitHub Pages.</p>
 </div>
 
 </body>
