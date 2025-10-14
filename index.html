@@ -95,7 +95,7 @@ small { display:block; margin-top:10px; color:#00FFFF; text-shadow:0 0 3px #00FF
 </div>
 
 <script>
-// === Firebase Config ===
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyBJWwUcOilz6u8UeXIsB7CXcSpskIGm5J4",
   authDomain: "neondashboard-5610e.firebaseapp.com",
@@ -107,42 +107,42 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// === Login & Registrierung ===
+// Zeigt Dashboard an
+function showDashboard() {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'flex';
+    document.body.classList.add('dashboard');
+    initDashboard();
+}
+
+// Login
 function login() {
     const email = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            document.getElementById('loginContainer').style.display='none';
-            document.getElementById('dashboard').style.display='flex';
-            document.body.classList.add('dashboard');
-            initDashboard();
-        })
-        .catch(e => alert(e.message));
+        .then(() => showDashboard())
+        .catch(err => alert(err.message));
 }
 
+// Registrierung
 function register() {
     const email = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     if(!email || !password) return alert("Bitte Email und Passwort eingeben!");
     auth.createUserWithEmailAndPassword(email, password)
         .then(() => alert("Registrierung erfolgreich! Bitte nun einloggen."))
-        .catch(e => alert(e.message));
+        .catch(err => alert(err.message));
 }
 
+// Logout
 function logout() {
     auth.signOut().then(() => location.reload());
 }
 
 // Auto-Login
 auth.onAuthStateChanged(user => {
-    if(user){
-        document.getElementById('loginContainer').style.display='none';
-        document.getElementById('dashboard').style.display='flex';
-        document.body.classList.add('dashboard');
-        initDashboard();
-    }
+    if(user) showDashboard();
 });
 
 // Dashboard Tabs
@@ -154,11 +154,11 @@ function showTab(tabId){
 // Clipboard Copy
 function copyToClipboard(text){ navigator.clipboard.writeText(text).then(()=>alert('Link kopiert: '+text)).catch(err=>alert('Fehler: '+err)); }
 
-// Dashboard Init + Charts
+// Dashboard + Charts
 function initDashboard(){
     showTab('modsCard');
-    const downloadsCtx=document.getElementById('downloadsChart').getContext('2d');
-    const visitorsCtx=document.getElementById('visitorsChart').getContext('2d');
+    const downloadsCtx = document.getElementById('downloadsChart').getContext('2d');
+    const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
 
     window.downloadsChart = new Chart(downloadsCtx,{
         type:'line',
@@ -172,7 +172,6 @@ function initDashboard(){
         options:{responsive:true,scales:{y:{beginAtZero:true}}}
     });
 
-    // Live Update Simulation
     setInterval(()=>{
         document.querySelector('#modsCard p').textContent = Math.floor(Math.random()*500);
         document.querySelector('#cheatsCard p').textContent = Math.floor(Math.random()*200);
@@ -186,6 +185,5 @@ function initDashboard(){
     },5000);
 }
 </script>
-
 </body>
 </html>
