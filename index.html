@@ -1,240 +1,298 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neon Dashboard mit Login</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Neon Dashboard — Pulsierend Blau</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-* { margin:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
-body { background-color:#0f0f1f; color:#00FFFF; }
-
-/* LOGIN STYLES */
-#loginContainer { display:flex; justify-content:center; align-items:center; height:100vh; background-image:url('background-image.jpeg'); background-size:cover; }
-.glass-container { width:300px; padding:30px; background:rgba(255,255,255,0.1); border-radius:10px; border:1px solid #fff; backdrop-filter:blur(5px);}
-.login-box { text-align:center; max-width:250px; margin:0 auto; }
-h2 { color:#fff; margin-bottom:20px; }
-input { padding:10px; margin-top:15px; border:1px solid #fff; border-radius:10px; background:transparent; color:#fff; }
-input::placeholder { color:#fff; }
-input:focus { outline:none; }
-button { background:#fff; color:black; padding:10px; border:none; border-radius:10px; cursor:pointer; margin-top:15px; }
-button:hover { background:transparent; color:white; outline:1px solid #fff; }
-.options { display:flex; align-items:center; margin-top:10px; font-size:12px; color:white; }
-.options input { margin-right:5px; }
-.options a { margin-left:auto; text-decoration:none; color:white; cursor:pointer; }
-p { font-size:12px; color:#fff; margin-top:15px; }
-#register { font-weight:bold; }
-
-/* DASHBOARD STYLES */
-#dashboard { display:none; flex:1; height:100vh; overflow:auto; padding:20px; }
-body.dashboard { display:flex; color:#00FFFF; }
-
-.sidebar { width:220px; background-color:rgba(0,0,0,0.6); backdrop-filter:blur(10px); min-height:100vh; padding:20px; border-right:1px solid rgba(0,255,255,0.3); }
-.sidebar h2 { margin-bottom:20px; font-size:1.5rem; text-shadow:0 0 5px #00FFFF; }
-.sidebar a { display:block; color:#00FFFF; text-decoration:none; margin:10px 0; padding:10px; border-radius:10px; transition:all 0.3s; text-shadow:0 0 3px #00FFFF; cursor:pointer; }
-.sidebar a:hover { background-color: rgba(0,255,255,0.2); }
-
-.main { flex:1; padding:20px; box-sizing:border-box; }
-.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; margin-bottom:40px; }
-.card { background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius:15px; box-shadow:0 0 20px rgba(0,255,255,0.2); border:1px solid rgba(0,255,255,0.3); padding:20px; transition:all 0.3s; text-align:center; display:none; }
-.card h3 { margin-top:0; text-shadow:0 0 5px #00FFFF; }
-
-.chart-container {
-    background: rgba(0,0,0,0.4); backdrop-filter:blur(10px); border-radius:15px; box-shadow:0 0 20px rgba(0,255,255,0.2); border:1px solid rgba(0,255,255,0.3); padding:20px; margin-bottom:40px;
-    filter: drop-shadow(0 0 10px #00FFFF) drop-shadow(0 0 20px #00FFFF) drop-shadow(0 0 30px #00FFFF);
-    animation: neonPulse 2s infinite ease-in-out;
+:root{
+  --bg:#0f0f1f; 
+  --neon:#00FFFF; 
+  --muted: rgba(255,255,255,0.08); 
+  --card-bg: rgba(0,0,0,0.45);
 }
-@keyframes neonPulse { 0% { box-shadow:0 0 10px #00FFFF,0 0 20px #00FFFF,0 0 30px #00FFFF;} 50% { box-shadow:0 0 20px #00FFFF,0 0 40px #00FFFF,0 0 60px #00FFFF;} 100% { box-shadow:0 0 10px #00FFFF,0 0 20px #00FFFF,0 0 30px #00FFFF;} }
+*{box-sizing:border-box;font-family:Inter,Poppins,sans-serif}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--neon);}
 
-.neon-btn { background: rgba(0,255,255,0.1); color:#00FFFF; border:1px solid rgba(0,255,255,0.5); padding:12px 20px; border-radius:15px; font-weight:bold; cursor:pointer; text-shadow:0 0 5px #00FFFF; transition:all 0.3s ease-in-out; box-shadow:0 0 10px rgba(0,255,255,0.3); }
-.neon-btn:hover { background: rgba(0,255,255,0.25); box-shadow:0 0 10px #00FFFF,0 0 20px #00FFFF,0 0 30px #00FFFF; transform:translateY(-3px);}
-.neon-btn:active { transform:translateY(0); box-shadow:0 0 5px #00FFFF,0 0 10px #00FFFF; }
-small { display:block; margin-top:10px; color:#00FFFF; text-shadow:0 0 3px #00FFFF; }
+/* ===== Neon-Puls Animation ===== */
+@keyframes neonPulse {
+  0%,100% { text-shadow: 0 0 5px #00ffff,0 0 10px #00ffff,0 0 20px #00ffff; }
+  50% { text-shadow: 0 0 15px #00ffff,0 0 30px #00ffff,0 0 50px #00ffff; }
+}
+@keyframes cardPulse {
+  0%,100% { box-shadow:0 0 10px rgba(0,255,255,0.2),0 0 20px rgba(0,255,255,0.15); border-color: rgba(0,255,255,0.2);}
+  50% { box-shadow:0 0 20px rgba(0,255,255,0.5),0 0 40px rgba(0,255,255,0.35); border-color: rgba(0,255,255,0.35);}
+}
+
+.neon-pulse { animation: neonPulse 1.5s infinite alternate; color:var(--neon); }
+.card.pulse, .youtube-video, .announcement-item, .sidebar { animation: cardPulse 2s infinite alternate; }
+.btn-accept.pulse, .ann-input button.pulse, .gate-input.pulse { animation: neonPulse 1.2s infinite alternate; }
+
+/* Gate */
+#gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,0.6),rgba(0,0,0,0.75));z-index:9999}
+.gate-card{width:380px;max-width:92%;padding:24px;border-radius:12px;text-align:center;background:linear-gradient(135deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));backdrop-filter:blur(6px); border:1px solid rgba(0,255,255,0.12);}
+.gate-card h1{margin:0 0 8px;font-size:20px}
+.gate-input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--neon);outline:none;}
+.gate-actions{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.gate-error{color:#ff6b6b;margin-top:8px;display:none}
+
+/* Layout */
+#dashboard{display:none;height:100vh;width:100%;display:flex;overflow:hidden}
+.sidebar{width:180px;padding:18px;border-right:1px solid rgba(0,255,255,0.06);background:linear-gradient(180deg,rgba(0,0,0,0.5),rgba(0,0,0,0.35));}
+.sidebar h2, .sidebar a { color: var(--neon); animation: neonPulse 2s infinite alternate; }
+.sidebar a { display:block; text-decoration:none; margin:6px 0; padding:8px; border-radius:8px; cursor:pointer; }
+
+.main{flex:1;padding:16px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+
+.top-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:var(--card-bg);border-radius:10px;padding:12px;border:1px solid rgba(0,255,255,0.06); color: var(--neon);}
+.card h3, .video-title { color: var(--neon); text-shadow:0 0 5px #00ffff; }
+
+.youtube-container{display:flex;gap:12px;overflow-x:auto;padding:8px 4px}
+.youtube-container::-webkit-scrollbar{height:8px}
+.youtube-container::-webkit-scrollbar-thumb{background:var(--neon);border-radius:6px;opacity:.95}
+.youtube-video{min-width:300px;background:linear-gradient(180deg,rgba(0,0,0,0.45),rgba(0,0,0,0.3));border-radius:10px;padding:8px;border:1px solid rgba(0,255,255,0.06); display:flex;flex-direction:column;align-items:center;}
+
+.btn-accept, .ann-input button, .gate-input { border-radius:8px; color:#001; background:var(--neon); border:1px solid rgba(0,255,255,0.5); }
+.status-pill, .pill { color:#001; font-weight:700; border-radius:999px; }
+
+.discord-tile { color: var(--neon); border:1px dashed rgba(0,255,255,0.06); animation: neonPulse 2s infinite alternate; }
+
+.announcements{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-top:8px}
+.announcement-item{padding:8px;border-radius:8px;background:linear-gradient(90deg,rgba(0,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(0,255,255,0.04);}
+
+.charts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px}
+canvas{background:transparent!important}
+
+@media (max-width:900px){ 
+  .top-grid{grid-template-columns:1fr} 
+  .youtube-video{min-width:260px} 
+  .discord-tile{width:260px;height:140px} 
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginContainer">
-    <div class="glass-container">
-        <div class="login-box">
-            <h2 id="formTitle">Login</h2>
-            <form id="authForm">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <div class="options" id="loginOptions">
-                    <input type="checkbox" id="remember"><label for="remember">Remember me</label>
-                    <a href="#" id="forgotPassword">Forgot Password?</a>
-                </div>
-                <button type="submit" id="submitBtn">Login</button>
-                <p id="toggleText">Don't have an account? <a href="#" id="toggleForm">Register</a></p>
-            </form>
-        </div>
+<!-- GATE -->
+<div id="gate">
+  <div class="gate-card">
+    <h1 class="neon-pulse">🔒 Zugangssperre</h1>
+    <p>Bitte Master-Passwort eingeben</p>
+    <input id="gateInput" class="gate-input pulse" type="password" placeholder="Master-Passwort">
+    <div class="gate-actions">
+      <button id="gateBtn" class="btn btn-accept pulse">Einloggen</button>
     </div>
+    <div id="gateError" class="gate-error">Falsches Passwort — versuche es erneut.</div>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard">
-    <div class="sidebar">
-        <h2>Dashboard</h2>
-        <a onclick="showTab('modsCard')">Mods</a>
-        <a onclick="showTab('cheatsCard')">Cheats</a>
-        <a onclick="showTab('downloadsCard')">Downloads</a>
-        <a onclick="showTab('visitorsCard')">Besucher</a>
-        <a onclick="logout()">Logout</a>
+  <aside class="sidebar">
+    <h2>Dashboard</h2>
+    <a onclick="showTab('modsCard')">Mods</a>
+    <a onclick="showTab('cheatsCard')">Cheats</a>
+    <a onclick="showTab('visitorsCard')">Besucher</a>
+    <a onclick="showTab('youtubeCard')">YouTube / Discord</a>
+    <a onclick="showTab('websitesCard')">Websites</a>
+    <a onclick="showTab('announcementsCard')">Ankündigungen</a>
+  </aside>
+
+  <main class="main">
+    <div class="top-grid">
+      <div class="card pulse tab-content" id="modsCard"><h3>Mods</h3><p id="modsCount">0</p></div>
+      <div class="card pulse tab-content" id="cheatsCard"><h3>Cheats</h3><p id="cheatsCount">0</p></div>
+      <div class="card pulse tab-content" id="visitorsCard"><h3>Besucher</h3><p id="visitorsCount">0</p></div>
     </div>
-    <div class="main">
-        <div class="cards">
-            <div class="card tab-content" id="modsCard"><h3>Mods</h3><p>0</p><small>Verfügbare Mods</small></div>
-            <div class="card tab-content" id="cheatsCard"><h3>Cheats</h3><p>0</p><small>Beschreibung der Cheats</small></div>
-            <div class="card tab-content" id="downloadsCard">
-                <h3>Downloads</h3><p>0</p>
-                <div style="margin-top:15px; display:flex; flex-direction:column; gap:12px;">
-                    <button class="neon-btn" onclick="copyToClipboard('https://example.com/download1')">Download 1</button>
-                    <button class="neon-btn" onclick="copyToClipboard('https://example.com/download2')">Download 2</button>
-                    <button class="neon-btn" onclick="window.open('https://www.youtube.com/channel/YOUR_CHANNEL','_blank')">YouTube</button>
-                    <button class="neon-btn" onclick="copyToClipboard('https://discord.gg/YOUR_INVITE')">Discord</button>
-                </div>
-            </div>
-            <div class="card tab-content" id="visitorsCard"><h3>Besucher</h3><p>0</p></div>
-        </div>
-        <div class="chart-container"><canvas id="downloadsChart"></canvas></div>
-        <div class="chart-container"><canvas id="visitorsChart"></canvas></div>
+
+    <div class="card pulse tab-content" id="youtubeCard">
+      <h3>YouTube & Discord</h3>
+      <div class="youtube-container" id="youtubeContainer"></div>
     </div>
+
+    <div class="card pulse tab-content" id="websitesCard">
+      <h3>Nützliche Websites</h3>
+      <div class="website-list" id="websiteList"></div>
+    </div>
+
+    <div class="card pulse tab-content" id="announcementsCard">
+      <h3>Ankündigungen</h3>
+      <div class="ann-input">
+        <input id="annText" placeholder="Neue Ankündigung..." class="pulse">
+        <button id="addAnnBtn" class="pulse">Hinzufügen</button>
+      </div>
+      <div class="announcements" id="announcementsContainer"></div>
+    </div>
+
+    <div class="charts">
+      <div class="card pulse chart-container"><h3>Downloads (7 Tage)</h3><canvas id="downloadsChart"></canvas></div>
+      <div class="card pulse chart-container"><h3>Besucher (7 Tage)</h3><canvas id="visitorsChart"></canvas></div>
+    </div>
+  </main>
 </div>
 
 <script>
-// LOGIN & REGISTRATION
-let authForm = document.getElementById('authForm');
-let toggleForm = document.getElementById('toggleForm');
-let formTitle = document.getElementById('formTitle');
-let submitBtn = document.getElementById('submitBtn');
-let loginOptions = document.getElementById('loginOptions');
-let isLogin = true;
-
-// Umschalten Login/Register
-function toggleLoginRegister(e){
-    e.preventDefault(); 
-    isLogin = !isLogin;
-    if(isLogin){
-        formTitle.textContent="Login";
-        submitBtn.textContent="Login";
-        loginOptions.style.display="flex";
-        toggleForm.parentElement.innerHTML=`Don't have an account? <a href="#" id="toggleForm">Register</a>`;
-        document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
-    } else {
-        formTitle.textContent="Register";
-        submitBtn.textContent="Register";
-        loginOptions.style.display="none";
-        toggleForm.parentElement.innerHTML=`Already have an account? <a href="#" id="toggleForm">Login</a>`;
-        document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
-    }
+async function sha256Hex(message){
+  const enc = new TextEncoder().encode(message);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
+const MASTER_HASH = "c2e6d830aeb6f2227dd03c31f201f6fd252535814a2a720d5392c1af5f016b1b";
 
-document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
+const gate = document.getElementById('gate');
+const gateInput = document.getElementById('gateInput');
+const gateBtn = document.getElementById('gateBtn');
+const gateError = document.getElementById('gateError');
+const dashboard = document.getElementById('dashboard');
 
-// Form Submission
-authForm.addEventListener('submit', e=>{
-    e.preventDefault();
-    const username=document.getElementById('username').value.trim();
-    const password=document.getElementById('password').value.trim();
-    if(!username||!password) return alert("Bitte Username und Passwort eingeben.");
-    let users=JSON.parse(localStorage.getItem('users')||'[]');
-
-    if(isLogin){
-        const user=users.find(u=>u.username===username && u.password===password);
-        if(user){ loginSuccess(username); } else { alert("Falscher Username oder Passwort!"); }
-    } else {
-        if(users.find(u=>u.username===username)) return alert("Username existiert bereits!");
-        users.push({username,password});
-        localStorage.setItem('users',JSON.stringify(users));
-        alert("Registrierung erfolgreich! Bitte jetzt einloggen.");
-
-        // Zurück zum Login
-        isLogin = true;
-        formTitle.textContent = "Login";
-        submitBtn.textContent = "Login";
-        loginOptions.style.display = "flex";
-        toggleForm.parentElement.innerHTML = `Don't have an account? <a href="#" id="toggleForm">Register</a>`;
-        document.getElementById('toggleForm').addEventListener('click', toggleLoginRegister);
-    }
-});
-
-function loginSuccess(username){
-    localStorage.setItem('loggedInUser',username);
-    document.getElementById('loginContainer').style.display='none';
-    document.getElementById('dashboard').style.display='flex';
-    document.body.classList.add('dashboard');
+async function tryMaster(){
+  const v = (gateInput.value||"").trim();
+  if(!v){ gateError.textContent="Kein Passwort eingegeben."; gateError.style.display='block'; return; }
+  gateError.style.display='none';
+  gateBtn.disabled = true;
+  const h = await sha256Hex(v);
+  gateBtn.disabled = false;
+  if(h === MASTER_HASH){
+    sessionStorage.setItem('masterAllowed','1');
+    gate.style.display='none';
+    dashboard.style.display='flex';
     initDashboard();
+  } else {
+    gateError.textContent='Falsches Passwort — versuche es erneut.';
+    gateError.style.display='block';
+    gateInput.value=''; gateInput.focus();
+  }
 }
 
-function logout(){
-    localStorage.removeItem('loggedInUser');
-    location.reload();
+gateBtn.addEventListener('click', tryMaster);
+gateInput.addEventListener('keydown', e=>{ if(e.key==='Enter') tryMaster(); });
+
+if(sessionStorage.getItem('masterAllowed')==='1'){
+  gate.style.display='none';
+  dashboard.style.display='flex';
+  initDashboard();
 }
 
-// Passwort zurücksetzen
-document.getElementById('forgotPassword').addEventListener('click', e=>{
-    e.preventDefault();
-    const username = prompt("Gib deinen Benutzernamen ein, um das Passwort zurückzusetzen:");
-    if(!username) return;
-    let users = JSON.parse(localStorage.getItem('users')||'[]');
-    const userIndex = users.findIndex(u=>u.username===username);
-    if(userIndex === -1) return alert("Benutzer nicht gefunden!");
-    const newPassword = prompt("Gib dein neues Passwort ein:");
-    if(!newPassword) return alert("Kein Passwort eingegeben!");
-    users[userIndex].password = newPassword;
-    localStorage.setItem('users', JSON.stringify(users));
-    alert("Passwort erfolgreich geändert! Du kannst dich jetzt mit dem neuen Passwort einloggen.");
-});
-
-// Dashboard Tabs
-function showTab(tabId){
-    document.querySelectorAll('.tab-content').forEach(tab=>tab.style.display='none');
-    document.getElementById(tabId).style.display='block';
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+  const el = document.getElementById(id);
+  if(el) el.style.display='block';
 }
 
-// Clipboard Copy
-function copyToClipboard(text){ navigator.clipboard.writeText(text).then(()=>alert('Link kopiert: '+text)).catch(err=>alert('Fehler: '+err)); }
-
-// Dashboard Init + Charts
 function initDashboard(){
-    showTab('modsCard');
-    const downloadsCtx=document.getElementById('downloadsChart').getContext('2d');
-    const visitorsCtx=document.getElementById('visitorsChart').getContext('2d');
+  showTab('modsCard');
+  document.getElementById('modsCount').textContent = Math.floor(Math.random()*300);
+  document.getElementById('cheatsCount').textContent = Math.floor(Math.random()*150);
+  document.getElementById('visitorsCount').textContent = Math.floor(Math.random()*4000);
 
-    window.downloadsChart = new Chart(downloadsCtx,{
-        type:'line',
-        data:{ labels:['Mo','Di','Mi','Do','Fr','Sa','So'], datasets:[{label:'Downloads',data:Array(7).fill(0),borderColor:'rgba(0,255,255,1)',backgroundColor:'rgba(0,255,255,0.2)',borderWidth:3,fill:true,tension:0.3}] },
-        options:{responsive:true,scales:{y:{beginAtZero:true}}}
-    });
+  // YouTube + Discord
+  const ytContainer = document.getElementById('youtubeContainer');
+  ytContainer.innerHTML = '';
+  const discordTile = document.createElement('a');
+  discordTile.className = 'discord-tile';
+  discordTile.href = 'https://discord.com/invite/UGqxpbrcux';
+  discordTile.target = '_blank';
+  discordTile.textContent = '💬 DISCORD — Join';
+  ytContainer.appendChild(discordTile);
 
-    window.visitorsChart = new Chart(visitorsCtx,{
-        type:'bar',
-        data:{ labels:['Mo','Di','Mi','Do','Fr','Sa','So'], datasets:[{label:'Besucher',data:Array(7).fill(0),backgroundColor:'rgba(0,255,255,0.5)',borderColor:'rgba(0,255,255,1)',borderWidth:1}] },
-        options:{responsive:true,scales:{y:{beginAtZero:true}}}
-    });
+  const videos = [
+    {title:'NequisAi', embed:'https://www.youtube.com/embed/zHp_7-AE_Is', status:'Online'},
+    {title:'Dein Video 2', embed:'https://www.youtube.com/embed/VIDEO_ID2', status:'Online'},
+    {title:'Dein Video 3', embed:'https://www.youtube.com/embed/VIDEO_ID3', status:'Offline'}
+  ];
+  videos.forEach(v=>{
+    const div = document.createElement('div');
+    div.className = 'youtube-video pulse';
+    div.innerHTML = `<iframe src="${v.embed}" title="${escapeHtml(v.title)}" allowfullscreen></iframe>
+                     <div class="video-title">${escapeHtml(v.title)}</div>
+                     <div class="status-pill ${v.status==='Online'?'online':'offline'}">${v.status}</div>`;
+    ytContainer.appendChild(div);
+  });
 
-    // Live Update Simulation
-    setInterval(()=>{
-        document.querySelector('#modsCard p').textContent = Math.floor(Math.random()*500);
-        document.querySelector('#cheatsCard p').textContent = Math.floor(Math.random()*200);
-        document.querySelector('#downloadsCard p').textContent = Math.floor(Math.random()*10000);
-        document.querySelector('#visitorsCard p').textContent = Math.floor(Math.random()*5000);
+  // Websites
+  const sites = [
+    {name:'NequisAi', link:'https://gigagamer9393.github.io/NequisAi-/', status:'Online'},
+    {name:'Shadow ESP', link:'https://gigagamer9393.github.io/Shadow/'},
+    {name:'GTA Modmenus', link:'https://gigagamer9393.github.io/GigarazorLpModss/', status:'Online'},
+    {name:'Discord', link:'https://discord.com/invite/UGqxpbrcux', status:'Online'}
+  ];
+  const list = document.getElementById('websiteList');
+  list.innerHTML = '';
+  sites.forEach(s=>{
+    const a = document.createElement('a');
+    a.className = 'website-link neon-pulse';
+    a.href = s.link; a.target = '_blank';
+    a.innerHTML = `<span>${escapeHtml(s.name)}</span><span class="pill" style="background:${s.status==='Online'?'#7ef9a4':'#ff7b7b'}">${escapeHtml(s.status)}</span>`;
+    list.appendChild(a);
+  });
 
-        downloadsChart.data.datasets[0].data = Array.from({length:7},()=>Math.floor(Math.random()*1000));
-        downloadsChart.update();
-        visitorsChart.data.datasets[0].data = Array.from({length:7},()=>Math.floor(Math.random()*500));
-        visitorsChart.update();
-    },5000);
+  // Announcements
+  const ann = ["Server Online","Download Server Online","Discord: Supportkanal Online"];
+  const annContainer = document.getElementById('announcementsContainer');
+  annContainer.innerHTML = '';
+  ann.forEach(pushAnnouncement);
+  document.getElementById('addAnnBtn').addEventListener('click', ()=>{
+    const txt = document.getElementById('annText').value.trim();
+    if(txt){ pushAnnouncement(txt); document.getElementById('annText').value=''; }
+  });
+
+  // Charts
+  const downloadsCtx = document.getElementById('downloadsChart').getContext('2d');
+  const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
+  window.downloadsChart = new Chart(downloadsCtx, {
+    type:'line',
+    data:{ labels:['Mo','Di','Mi','Do','Fr','Sa','So'], datasets:[{label:'Downloads', data:Array.from({length:7},()=>rand(0,900)), fill:true, borderColor:'rgba(0,255,255,0.95)', backgroundColor:'rgba(0,255,255,0.08)', tension:0.3 }]},
+    options:{responsive:true,scales:{y:{beginAtZero:true}}}
+  });
+  window.visitorsChart = new Chart(visitorsCtx, {
+    type:'bar',
+    data:{ labels:['Mo','Di','Mi','Do','Fr','Sa','So'], datasets:[{label:'Besucher', data:Array.from({length:7},()=>rand(0,400)), backgroundColor:'rgba(0,255,255,0.25)', borderColor:'rgba(0,255,255,0.95)', borderWidth:1 }]},
+    options:{responsive:true,scales:{y:{beginAtZero:true}}}
+  });
+
+  // Charts pulsieren
+  pulseChartColors(window.downloadsChart);
+  pulseChartColors(window.visitorsChart);
+
+  // Live  Updates
+  setInterval(()=>{
+    document.getElementById('modsCount').textContent = rand(0,500);
+    document.getElementById('cheatsCount').textContent = rand(0,250);
+    document.getElementById('visitorsCount').textContent = rand(0,8000);
+    downloadsChart.data.datasets[0].data = Array.from({length:7},()=>rand(0,1000)); downloadsChart.update();
+    visitorsChart.data.datasets[0].data = Array.from({length:7},()=>rand(0,400)); visitorsChart.update();
+  },5000);
 }
 
-// Auto-Login wenn User bereits eingeloggt
-window.addEventListener('load',()=>{
-    const loggedInUser=localStorage.getItem('loggedInUser');
-    if(loggedInUser){ loginSuccess(loggedInUser); }
-});
-</script>
+function pushAnnouncement(msg){
+  const container = document.getElementById('announcementsContainer');
+  const d = document.createElement('div'); d.className='announcement-item pulse'; d.textContent=msg;
+  container.prepend(d);
+}
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min }
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 
+// Pulsierende Chart-Farben (Blau)
+function pulseChartColors(chart, interval = 50){
+    let dir = 1, alpha = 0.1;
+    setInterval(()=>{
+        alpha += dir * 0.02;
+        if(alpha >= 0.8) dir = -1;
+        if(alpha <= 0.1) dir = 1;
+
+        chart.data.datasets.forEach(ds=>{
+            if(ds.type==='line' || ds.type===undefined){
+                ds.borderColor = `rgba(0,255,255,${alpha})`;
+                ds.backgroundColor = `rgba(0,255,255,${alpha/8})`;
+            } else if(ds.type==='bar'){
+                ds.backgroundColor = `rgba(0,255,255,${alpha/4})`;
+                ds.borderColor = `rgba(0,255,255,${alpha})`;
+            }
+        });
+        chart.update();
+    }, interval);
+}
+</script>
 </body>
 </html>
